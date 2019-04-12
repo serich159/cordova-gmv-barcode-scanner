@@ -6,7 +6,7 @@ function GMVBarcodeScanner() {
 
 }
 
-var orientationMap = 
+var orientationMap =
 {
 	unlocked: 0,
 	portrait: 1,
@@ -102,12 +102,12 @@ GMVBarcodeScanner.prototype.scan = function(params, callback, torchChangeCallbac
 GMVBarcodeScanner.prototype.sendScanRequest = function(settings, callback, torchChangeCallback) {
     callback = typeof callback == "function" ? callback : function() {};
 	torchChangeCallback = typeof torchChangeCallback == "function" ? torchChangeCallback : function(torchOn){ } ;
-	
+
     cordova.exec(function (data) {
 			if(data[0] == "torchType")
 				torchChangeCallback(data[1]);
 			else
-				callback(data[1]);
+				callback(null, data[1]);
         },
         function (err){
             switch(err[0]) {
