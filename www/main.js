@@ -6,8 +6,14 @@ function GMVBarcodeScanner() {
 
 }
 
-GMVBarcodeScanner.prototype.scan = function(params, callback) {
+var orientationMap = 
+{
+	unlocked: 0,
+	portrait: 1,
+	landscape: 2
+}
 
+GMVBarcodeScanner.prototype.scan = function(params, callback, torchChangeCallback) {
     // Default settings. Scan every barcode type.
     var settings = {
         types: {
@@ -28,7 +34,9 @@ GMVBarcodeScanner.prototype.scan = function(params, callback) {
         detectorSize: {
             width: .5,
             height: .7
-        }
+        },
+		torchOn: false,
+		orientation: 'unlocked'
     };
 
     for(var key in params) {
@@ -74,7 +82,11 @@ GMVBarcodeScanner.prototype.scan = function(params, callback) {
         //Position 2
         detectorWidth: settings.detectorSize.width,
         //Position 3
-        detectorHeight: settings.detectorSize.height
+        detectorHeight: settings.detectorSize.height,
+		// Position 4
+		torchOn: settings.torchOn,
+		// Position 5
+		orientation: orientationMap[settings.orientation]
     };
 
     var sendSettings = [];
@@ -84,13 +96,18 @@ GMVBarcodeScanner.prototype.scan = function(params, callback) {
         }
     }
 
-    this.sendScanRequest(sendSettings, callback);
+    this.sendScanRequest(sendSettings, callback, torchChangeCallback);
 };
 
-GMVBarcodeScanner.prototype.sendScanRequest = function(settings, callback) {
+GMVBarcodeScanner.prototype.sendScanRequest = function(settings, callback, torchChangeCallback) {
     callback = typeof callback == "function" ? callback : function() {};
+	torchChangeCallback = typeof torchChangeCallback == "function" ? torchChangeCallback : function(torchOn){ } ;
+	
     cordova.exec(function (data) {
-            callback(null, data[0]);
+			if(data[0] == "torchType")
+				torchChangeCallback(data[1]);
+			else
+				callback(data[1]);
         },
         function (err){
             switch(err[0]) {

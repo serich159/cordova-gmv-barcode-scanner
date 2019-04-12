@@ -25,10 +25,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -86,6 +88,8 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
     // helper objects for detecting taps and pinches.
     private ScaleGestureDetector scaleGestureDetector;
     private GestureDetector gestureDetector;
+    
+    private ResultReceiver mReceiver;
 
     /**
      * Initializes the UI and creates the detector pipeline.
@@ -112,17 +116,44 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
 
         setContentView(getResources().getIdentifier("barcode_capture", "layout", getPackageName()));
 
+        ViewFinderWidth = getIntent().getDoubleExtra("ViewFinderWidth", .5);
+        ViewFinderHeight = getIntent().getDoubleExtra("ViewFinderHeight", .7);
+        mReceiver = getIntent().getParcelableExtra("Receiver");
 
         mPreview = (CameraSourcePreview) findViewById(getResources().getIdentifier("preview", "id", getPackageName()));
         mPreview.ViewFinderWidth = ViewFinderWidth;
         mPreview.ViewFinderHeight = ViewFinderHeight;
+        mPreview.setOnTorchModeChangedListener(new CameraSourcePreview.OnChangedListener()
+        {
+            @Override
+            public void OnChanged(boolean value)
+            {
+            	Bundle bundle = new Bundle();
+            	bundle.putFloat("flashState", value ? 1 : 0);
+                mReceiver.send(0, bundle);
+            }
+        });
+        mPreview.setOnCloseRunnable(new Runnable(){
+        	@Override
+        	public void run()
+        	{
+        		setResult(CommonStatusCodes.SUCCESS, null);
+        		finish();
+        	}
+        });
+        
         mGraphicOverlay = (GraphicOverlay<BarcodeGraphic>) findViewById(getResources().getIdentifier("graphicOverlay", "id", getPackageName()));
 
 
         // read parameters from the intent used to launch the activity.
         DetectionTypes = getIntent().getIntExtra("DetectionTypes", 1234);
-        ViewFinderWidth = getIntent().getDoubleExtra("ViewFinderWidth", .5);
-        ViewFinderHeight = getIntent().getDoubleExtra("ViewFinderHeight", .7);
+        mPreview.SetTorchState(getIntent().getBooleanExtra("TorchOn", false));
+
+        int orientation = getIntent().getIntExtra("Orientation", 0);
+        if(orientation == 1)
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        else if(orientation == 2)
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         // Check for the camera permission before accessing the camera.  If the
         // permission is not granted yet, request permission.

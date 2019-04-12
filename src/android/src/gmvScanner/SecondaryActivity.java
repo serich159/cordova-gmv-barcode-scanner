@@ -53,8 +53,11 @@ public class SecondaryActivity extends Activity implements View.OnClickListener 
         Intent intent = new Intent(this, BarcodeCaptureActivity.class);
 
         intent.putExtra("DetectionTypes", getIntent().getIntExtra("DetectionTypes", 1234));
-        intent.putExtra("ViewFinderWidth", getIntent().getDoubleExtra("DetectionTypes", .5));
-        intent.putExtra("ViewFinderHeight", getIntent().getDoubleExtra("DetectionTypes", .7));
+        intent.putExtra("ViewFinderWidth", getIntent().getDoubleExtra("ViewFinderWidth", .5));
+        intent.putExtra("ViewFinderHeight", getIntent().getDoubleExtra("ViewFinderHeight", .7));
+        intent.putExtra("TorchOn", getIntent().getBooleanExtra("TorchOn", false));
+        intent.putExtra("Orientation", getIntent().getIntExtra("Orientation", 0));
+        intent.putExtra("Receiver", getIntent().getParcelableExtra("Receiver"));
 
         startActivityForResult(intent, RC_BARCODE_CAPTURE);
 
@@ -100,12 +103,12 @@ public class SecondaryActivity extends Activity implements View.OnClickListener 
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG, "Activity exited");
         if (requestCode == RC_BARCODE_CAPTURE) {
             Intent d = new Intent();
+            boolean callFinish = true;
             if (resultCode == CommonStatusCodes.SUCCESS) {
                 if (data != null) {
-                    Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
+                	Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
                     d.putExtra(BarcodeObject, barcode);
                     setResult(CommonStatusCodes.SUCCESS, data);
                 } else {
@@ -116,7 +119,9 @@ public class SecondaryActivity extends Activity implements View.OnClickListener 
                 d.putExtra("err", "There was an error with the barcode reader.");
                 setResult(CommonStatusCodes.ERROR, d);
             }
-            finish();
+
+            if(callFinish)
+                finish();
         }
         else {
             super.onActivityResult(requestCode, resultCode, data);

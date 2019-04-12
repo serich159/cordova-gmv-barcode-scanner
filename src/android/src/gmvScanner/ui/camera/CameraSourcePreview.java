@@ -15,6 +15,7 @@
  */
 package com.dealrinc.gmvScanner.ui.camera;
 
+import android.app.Activity;
 import android.Manifest;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -41,6 +42,7 @@ public class CameraSourcePreview extends ViewGroup {
     private SurfaceView mSurfaceView;
     private View mViewFinderView;
     private Button mTorchButton;
+    private Button mCloseButton;
     private boolean mStartRequested;
     private boolean mSurfaceAvailable;
     private CameraSource mCameraSource;
@@ -51,6 +53,18 @@ public class CameraSourcePreview extends ViewGroup {
 
     private GraphicOverlay mOverlay;
 
+    private OnChangedListener mTorchModeChangedListener;
+    
+    private Runnable mCloseRunnable;
+
+    public static interface OnChangedListener
+    {
+        void OnChanged(boolean val);
+    }
+
+    public void setOnTorchModeChangedListener(OnChangedListener value){mTorchModeChangedListener = value;}
+    public void setOnCloseRunnable(Runnable value){ mCloseRunnable = value;}
+
     public CameraSourcePreview(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
@@ -60,6 +74,7 @@ public class CameraSourcePreview extends ViewGroup {
         mSurfaceView = new SurfaceView(context);
         mSurfaceView.getHolder().addCallback(new SurfaceCallback());
         addView(mSurfaceView);
+
 
         mViewFinderView = new View(mContext);
         mViewFinderView.setBackgroundResource(getResources().getIdentifier("rounded_rectangle", "drawable", mContext.getPackageName()));
@@ -76,15 +91,27 @@ public class CameraSourcePreview extends ViewGroup {
             @Override
             public void onClick(View v) {
                 try {
-                        mCameraSource.setFlashMode(!mFlashState?Camera.Parameters.FLASH_MODE_TORCH :Camera.Parameters.FLASH_MODE_OFF);
-                        mFlashState = !mFlashState;
-                        mTorchButton.setBackgroundResource(getResources().getIdentifier(mFlashState ? "torch_active" : "torch_inactive", "drawable", mContext.getPackageName()));
+                    SetTorchState(!mFlashState);
+                    mTorchModeChangedListener.OnChanged(mFlashState);
                 } catch(Exception e) {
 
                 }
             }
         });
         addView(mTorchButton);
+
+        mCloseButton = new Button(mContext);
+        mCloseButton.setBackgroundResource(getResources().getIdentifier("close_btn", "drawable", mContext.getPackageName()));
+        mCloseButton.layout(dpToPx(45), 0, 0, dpToPx(45));
+        mCloseButton.setMaxWidth(50);
+
+        mCloseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	mCloseRunnable.run();
+            }
+        });
+        addView(mCloseButton);
     }
 
     public int dpToPx(int dp) {
@@ -127,6 +154,20 @@ public class CameraSourcePreview extends ViewGroup {
         }
     }
 
+    public void SetTorchState(boolean value)
+    {
+        mFlashState = value;
+        mTorchButton.setBackgroundResource(getResources().getIdentifier(mFlashState ? "torch_active" : "torch_inactive", "drawable", mContext.getPackageName()));
+        setFlashMode(mFlashState);
+    }
+
+    private void setFlashMode(boolean value)
+    {
+
+        if(mCameraSource != null)
+            mCameraSource.setFlashMode(value ? Camera.Parameters.FLASH_MODE_TORCH : Camera.Parameters.FLASH_MODE_OFF);
+    }
+
     @RequiresPermission(Manifest.permission.CAMERA)
     private void startIfReady() throws IOException, SecurityException {
         if (mStartRequested && mSurfaceAvailable) {
@@ -143,6 +184,7 @@ public class CameraSourcePreview extends ViewGroup {
                     mOverlay.setCameraInfo(max, min, mCameraSource.getCameraFacing());
                 }
                 mOverlay.clear();
+                setFlashMode(mFlashState);
             }
             mStartRequested = false;
         }
@@ -212,7 +254,6 @@ public class CameraSourcePreview extends ViewGroup {
 
         mSurfaceView.layout(leftOffset, topOffset, childWidth, childHeight);
 
-
         int actualWidth = (int) (layoutWidth*ViewFinderWidth);
         int actualHeight = (int) (layoutHeight*ViewFinderHeight);
 
@@ -221,8 +262,10 @@ public class CameraSourcePreview extends ViewGroup {
         int buttonSize = dpToPx(45);
         int torchLeft = (int) layoutWidth/2 + actualWidth/2 + (layoutWidth - (layoutWidth/2 + actualWidth/2))/2 - buttonSize/2;
         int torchTop = layoutHeight - (layoutWidth-torchLeft);
+        int closeLeft = layoutWidth-(torchLeft + buttonSize);
 
         mTorchButton.layout(torchLeft, torchTop, torchLeft + buttonSize, torchTop + buttonSize);
+        mCloseButton.layout(closeLeft, torchTop, closeLeft + buttonSize, torchTop + buttonSize);
 
         try {
             startIfReady();

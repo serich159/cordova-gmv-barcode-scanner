@@ -24,14 +24,14 @@ Usage
 To use the plugin simply call `window.plugins.GMVBarcodeScanner.scan(options, callback)`. See the sample below.
 
 ````javascript
-window.plugins.GMVBarcodeScanner.scan({}, function(err, result) { 
-    
+window.plugins.GMVBarcodeScanner.scan({}, function(err, result) {
+
 	//Handle Errors
 	if(err) return;
-	
+
 	//Do something with the data.
 	alert(result);
-	
+
 });
 ````
 
@@ -42,10 +42,10 @@ You can also call `scanLicense` or `scanVIN` to use the other scanning abilities
 window.plugins.GMVBarcodeScanner.scanVIN(function(err, result) {
 	//Handle Errors
 	if(err) return;
-	
+
 	//Do something with the data.
 	alert(result);
-	
+
 }, { width: .5, height: .7 });
 ````
 
@@ -53,10 +53,10 @@ window.plugins.GMVBarcodeScanner.scanVIN(function(err, result) {
 window.plugins.GMVBarcodeScanner.scanLicense(function(err, result) {
 	//Handle Errors
 	if(err) return;
-	
+
 	//Do something with the data.
 	alert(result);
-	
+
 }, { width: .5, height: .7 });
 ````
 
@@ -124,7 +124,7 @@ VIN scanning works on both iOS and Android and utilizes both Code39 and Data Mat
 Driver's license scanning works on both iOS and Android and scans the PDF417 format and decodes according to the AAMVA specification. It only pulls a few fields, but I believe they are the most important. The decoding is done in the Javascript portion of this plugin which means you could modify it if you'd like.
 
 ### Commercial Use
-This VIN scanner is the primary reason I built out this project, and is used in a commercial application for my company. Additionally, PDF417 scanning on drivers licenses is a massive benefit to the speed of the GMV library. I'd ask that any competitors don't utilize the VIN scanner for vehicles or PDF417 scanner for drivers licenses in applications that offer similar service to the [dealr.cloud](http://dealr.cloud) application. 
+This VIN scanner is the primary reason I built out this project, and is used in a commercial application for my company. Additionally, PDF417 scanning on drivers licenses is a massive benefit to the speed of the GMV library. I'd ask that any competitors don't utilize the VIN scanner for vehicles or PDF417 scanner for drivers licenses in applications that offer similar service to the [dealr.cloud](http://dealr.cloud) application.
 
 Maybe it's stupid for me to ask this, but I wanted to make this project MIT and open because I have always had trouble finding a good scanner for cordova and I wanted to help out other developers. Figured a bit of an ask is in order! :-)
 

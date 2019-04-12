@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-gmv-barcode-scanner" version="1.2" xmlns="http://apache.org/cordova/ns/plugins/1.0"
+<plugin id="cordova-gmv-barcode-scanner" version="1.3.0" xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android">
     <name>cordova-gmv-barcode-scanner</name>
     <js-module name="cordova-gmv-barcode-scanner" src="www/main.js">
         <clobbers target="cordova.plugins.gmv-barcode-scanner"/>
     </js-module>
-        
+
     <engines>
         <engine name="cordova" version=">=7.1.0"/>
         <engine name="cordova-android" version=">=6.3.0"/>
@@ -71,6 +71,7 @@
             <string name="title_activity_main">Barcode Reader Activity</string>
             <string name="barcode_header">Click &quot;Read Barcode&quot; to read a barcode</string>
             <string name="read_barcode">Read Barcode</string>
+			<string name="close">Close</string>
             <string name="auto_focus">Auto Focus</string>
             <string name="use_flash">Use Flash</string>
             <string name="barcode_success">Barcode read successfully</string>
@@ -90,6 +91,8 @@
                      target-dir="src/com/dealrinc/gmvScanner"/>
         <source-file src="src/android/src/gmvScanner/SecondaryActivity.java"
                      target-dir="src/com/dealrinc/gmvScanner"/>
+        <source-file src="src/android/src/gmvScanner/TorchStateChangeReceiver.java"
+                     target-dir="src/com/dealrinc/gmvScanner"/>
 
         <source-file src="src/android/src/gmvScanner/ui/camera/CameraSource.java"
                      target-dir="src/com/dealrinc/gmvScanner/ui/camera"/>
@@ -103,6 +106,8 @@
         <resource-file src="src/android/res/layout/barcode_capture.xml"
                        target="res/layout/barcode_capture.xml"/>
 
+        <resource-file src="src/android/res/drawable/close.png"
+                       target="res/drawable/close.png"/>
         <resource-file src="src/android/res/drawable/flashlight.png"
                        target="res/drawable/flashlight.png"/>
         <resource-file src="src/android/res/drawable/rounded_rectangle.xml"
@@ -111,12 +116,14 @@
                        target="res/drawable/torch_active.xml"/>
         <resource-file src="src/android/res/drawable/torch_inactive.xml"
                        target="res/drawable/torch_inactive.xml"/>
+        <resource-file src="src/android/res/drawable/close_btn.xml"
+                       target="res/drawable/close_btn.xml"/>
 
 
         <framework src="com.android.support:support-v4:27.1.0" />
         <framework src="com.google.android.gms:play-services-vision:11.0.1" />
         <framework src="com.android.support:design:27.1.0" />
-            
+
         <framework src="src/android/build-extras.gradle" custom="true" type="gradleReference"/>
     </platform>
 </plugin>
