@@ -88,7 +88,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
     // helper objects for detecting taps and pinches.
     private ScaleGestureDetector scaleGestureDetector;
     private GestureDetector gestureDetector;
-    
+
     private ResultReceiver mReceiver;
 
     /**
@@ -141,7 +141,6 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
         		finish();
         	}
         });
-        
         mGraphicOverlay = (GraphicOverlay<BarcodeGraphic>) findViewById(getResources().getIdentifier("graphicOverlay", "id", getPackageName()));
 
 
@@ -318,6 +317,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         if (mPreview != null) {
             mPreview.release();
         }
@@ -539,7 +539,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
             val = val.replaceAll("[ioqIOQ]", "");
 
             val = val.substring(0, Math.min(val.length(), 17));
-            
+
             barcode.rawValue = val;
 
             if(validateVin(val)) {
